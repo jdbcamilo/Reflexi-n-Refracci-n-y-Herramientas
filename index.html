@@ -1,0 +1,1462 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reflexión y Refracción de la Luz | Física III</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        :root {
+            --primary: #6a11cb;
+            --secondary: #2575fc;
+            --accent: #ff2d75;
+            --dark: #0f172a;
+            --darker: #0a0f1d;
+            --light: #f0f7ff;
+            --card-bg: rgba(30, 41, 59, 0.7);
+            --card-border: rgba(255, 255, 255, 0.1);
+        }
+        
+        body {
+            background: linear-gradient(135deg, var(--darker), var(--dark));
+            color: var(--light);
+            min-height: 100vh;
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+        
+        /* Contenedor de slides */
+        .slides-container {
+            display: flex;
+            width: 600%;
+            height: 100vh;
+            transition: transform 0.8s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+        }
+        
+        .slide {
+            width: 100vw;
+            height: 100vh;
+            padding: 2rem;
+            overflow-y: auto;
+            position: relative;
+        }
+        
+        /* Animación de fondo */
+        .background-effects {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+        
+        .particle {
+            position: absolute;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(106, 17, 203, 0.4), transparent 70%);
+            animation: float 15s infinite linear;
+        }
+        
+        @keyframes float {
+            0% { transform: translateY(0) translateX(0); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translateY(-100vh) translateX(100px); opacity: 0; }
+        }
+        
+        /* Navegación */
+        .navigation {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 0.5rem;
+            z-index: 100;
+        }
+        
+        .nav-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-dot.active {
+            background: var(--accent);
+            transform: scale(1.3);
+            box-shadow: 0 0 10px rgba(255, 45, 117, 0.5);
+        }
+        
+        .nav-btn {
+            position: fixed;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(30, 41, 59, 0.7);
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 100;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .nav-btn:hover {
+            background: var(--primary);
+            transform: translateY(-50%) scale(1.1);
+        }
+        
+        .prev-btn {
+            left: 1rem;
+        }
+        
+        .next-btn {
+            right: 1rem;
+        }
+        
+        .nav-btn i {
+            font-size: 1.5rem;
+            color: white;
+        }
+        
+        /* Estilos comunes */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        .team {
+    display: flex;
+    flex-wrap: nowrap; /* <-- no se parte nunca */
+    overflow-x: auto;   /* <-- scroll horizontal */
+    gap: 1rem;
+    padding-bottom: 1rem;
+    scrollbar-width: thin; /* Firefox */
+    position: relative;
+    z-index: 2;
+}
+.team::-webkit-scrollbar {
+    height: 6px;
+}
+.team::-webkit-scrollbar-thumb {
+    background: rgba(255,255,255,0.2);
+    border-radius: 10px;
+}
+
+        
+
+        
+        /* Contenido principal */
+        .content-section {
+            margin: 4rem 0;
+        }
+        
+        .section-title {
+            font-size: 2.5rem;
+            margin-bottom: 2.5rem;
+            color: var(--secondary);
+            text-align: center;
+            position: relative;
+            display: inline-block;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 0 1.5rem;
+        }
+        
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, var(--accent), transparent);
+            border-radius: 3px;
+        }
+        
+        .content-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2.5rem;
+            margin-bottom: 4rem;
+        }
+        
+        .card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 2.2rem;
+            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.35);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--card-border);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+            min-height: 350px;
+            opacity: 0;
+            transform: translateY(40px);
+        }
+        
+        .card.animate-in {
+            animation: fadeInUp 0.8s ease forwards;
+        }
+        
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(90deg, var(--accent), var(--secondary));
+        }
+        
+        .card:hover {
+            transform: translateY(-15px) scale(1.02);
+            box-shadow: 0 20px 45px rgba(0, 0, 0, 0.45);
+            border-color: rgba(255, 255, 255, 0.15);
+        }
+        
+        .card-title {
+            font-size: 1.9rem;
+            margin-bottom: 1.8rem;
+            color: var(--secondary);
+            display: flex;
+            align-items: center;
+        }
+        
+        .card-title i {
+            margin-right: 12px;
+            font-size: 1.6rem;
+            color: var(--accent);
+        }
+        
+        .card-content {
+            line-height: 1.8;
+            margin-bottom: 1.5rem;
+            font-size: 1.05rem;
+        }
+        
+        .card-content h3 {
+            color: var(--accent);
+            margin: 1.2rem 0 0.8rem;
+            font-size: 1.3rem;
+        }
+        
+        .card-content ul {
+            padding-left: 1.5rem;
+            margin: 0.8rem 0;
+        }
+        
+        .card-content li {
+            margin-bottom: 0.7rem;
+            position: relative;
+        }
+        
+        .card-content li::before {
+            content: '•';
+            color: var(--accent);
+            font-weight: bold;
+            display: inline-block;
+            width: 1em;
+            margin-left: -1em;
+        }
+        
+        .formula-box {
+            background: rgba(0, 0, 0, 0.2);
+            border-left: 3px solid var(--accent);
+            padding: 1rem;
+            margin: 1.2rem 0;
+            border-radius: 0 8px 8px 0;
+            font-family: 'Cambria', serif;
+            font-size: 1.2rem;
+            text-align: center;
+        }
+        
+        /* Sección de diferencias */
+        .differences-section {
+            background: linear-gradient(to right, rgba(106, 17, 203, 0.1), rgba(37, 117, 252, 0.1));
+            border-radius: 20px;
+            padding: 3rem;
+            margin: 4rem 0;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+        }
+        
+        .differences-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+        
+        .difference-card {
+            background: rgba(30, 41, 59, 0.6);
+            border-radius: 15px;
+            padding: 2rem;
+            border: 1px solid var(--card-border);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease;
+            opacity: 0;
+            transform: translateX(-50px);
+        }
+        
+        .difference-card:nth-child(2) {
+            transform: translateX(50px);
+        }
+        
+        .difference-card.animate-in {
+            animation: fadeInHorizontal 0.8s ease forwards;
+        }
+        
+        @keyframes fadeInHorizontal {
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        .difference-card:hover {
+            transform: translateY(-10px);
+        }
+        
+        .difference-title {
+            font-size: 1.8rem;
+            color: var(--accent);
+            margin-bottom: 1.5rem;
+            text-align: center;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--secondary);
+        }
+        
+        .difference-list {
+            list-style-type: none;
+        }
+        
+        .difference-list li {
+            padding: 1rem;
+            margin-bottom: 0.8rem;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            position: relative;
+            padding-left: 2.5rem;
+        }
+        
+        .difference-list li::before {
+            content: '→';
+            position: absolute;
+            left: 1rem;
+            color: var(--accent);
+            font-weight: bold;
+        }
+        
+        /* Simulación */
+        .simulation-section {
+            background: linear-gradient(to bottom, rgba(15, 23, 42, 0.9), rgba(10, 15, 29, 0.95));
+            border-radius: 25px;
+            padding: 3rem;
+            margin: 4rem 0;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            opacity: 0;
+            transform: scale(0.95);
+        }
+        
+        .simulation-section.animate-in {
+            animation: fadeInScale 1s ease forwards;
+        }
+        
+        @keyframes fadeInScale {
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+        
+        .simulation-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at top right, rgba(106, 17, 203, 0.15), transparent 50%);
+            pointer-events: none;
+        }
+        
+        .sim-title {
+            font-size: 2.6rem;
+            margin-bottom: 2.5rem;
+            color: var(--accent);
+            text-align: center;
+        }
+        
+        .sim-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2.5rem;
+        }
+        
+        .sim-controls {
+            flex: 1;
+            min-width: 300px;
+            background: rgba(30, 41, 59, 0.6);
+            border-radius: 18px;
+            padding: 1.8rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--card-border);
+        }
+        
+        .sim-canvas-container {
+            flex: 2;
+            min-width: 350px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        canvas {
+            background: rgba(10, 15, 29, 0.8);
+            border-radius: 15px;
+            width: 100%;
+            max-width: 100%;
+            box-shadow: 0 0 50px rgba(0, 80, 255, 0.25);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .controls {
+            display: flex;
+            flex-direction: column;
+            gap: 1.8rem;
+        }
+        
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+        }
+        
+        .control-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .control-title {
+            font-size: 1.2rem;
+            color: var(--accent);
+        }
+        
+        .control-value {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 0.3rem 0.8rem;
+            border-radius: 8px;
+            min-width: 60px;
+            text-align: center;
+            font-weight: bold;
+        }
+        
+        input[type="range"] {
+            width: 100%;
+            height: 12px;
+            -webkit-appearance: none;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            border-radius: 10px;
+            outline: none;
+            cursor: pointer;
+        }
+        
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 24px;
+            height: 24px;
+            background: var(--light);
+            border-radius: 50%;
+            border: 3px solid var(--accent);
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(255, 45, 117, 0.5);
+        }
+        
+        .medium-selector {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.8rem;
+            margin-top: 0.5rem;
+        }
+        
+        .medium-btn {
+            flex: 1;
+            min-width: 100px;
+            padding: 0.7rem;
+            background: rgba(30, 41, 59, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            color: var(--light);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+        
+        .medium-btn:hover {
+            background: rgba(37, 117, 252, 0.2);
+            border-color: var(--secondary);
+        }
+        
+        .medium-btn.active {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-color: transparent;
+            box-shadow: 0 0 15px rgba(37, 117, 252, 0.4);
+        }
+        
+        /* Conclusión */
+        .conclusion {
+            text-align: center;
+            padding: 4rem 2rem;
+            background: linear-gradient(to right, rgba(106, 17, 203, 0.15), rgba(37, 117, 252, 0.15));
+            border-radius: 25px;
+            margin: 4rem 0;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            opacity: 0;
+        }
+        
+        .conclusion.animate-in {
+            animation: fadeIn 1.2s ease forwards;
+        }
+        
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+            }
+        }
+        
+        .conclusion::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect width="100" height="100" fill="none" stroke="rgba(255,255,255,0.03)" stroke-width="1"/></svg>');
+            background-size: 50px;
+            opacity: 0.3;
+        }
+        
+        .conclusion h2 {
+            font-size: 2.8rem;
+            margin-bottom: 2rem;
+            color: var(--accent);
+            position: relative;
+        }
+        
+        .conclusion p {
+            font-size: 1.2rem;
+            max-width: 800px;
+            margin: 0 auto 2rem;
+            line-height: 1.8;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .conclusion .highlight {
+            color: var(--accent);
+            font-weight: bold;
+        }
+        
+        .team-signature {
+            margin-top: 2.5rem;
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: var(--secondary);
+            position: relative;
+            z-index: 2;
+        }
+        
+        .light-ray {
+            position: absolute;
+            width: 150%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--accent), transparent);
+            opacity: 0.2;
+            animation: rayMove 5s infinite linear;
+        }
+        
+        @keyframes rayMove {
+            0% { transform: translateX(-100%) rotate(30deg); }
+            100% { transform: translateX(100%) rotate(30deg); }
+        }
+        
+        .ray-1 { top: 20%; animation-delay: 0s; }
+        .ray-2 { top: 50%; animation-delay: -2s; }
+        .ray-3 { top: 80%; animation-delay: -4s; }
+        
+        /* Estilos específicos para portada */
+        .slide-1 {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+        
+        .title {
+            font-size: 4.5rem;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(90deg, var(--accent), var(--secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0 0 25px rgba(255, 45, 117, 0.4);
+            animation: titleGlow 3s infinite alternate;
+            letter-spacing: -1px;
+            opacity: 0;
+            transform: translateY(50px);
+        }
+        
+        .title.animate-in {
+            animation: fadeInDown 0.8s ease forwards, titleGlow 3s infinite alternate;
+        }
+        
+        @keyframes fadeInDown {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes titleGlow {
+            0% { text-shadow: 0 0 15px rgba(255, 45, 117, 0.4); }
+            100% { text-shadow: 0 0 35px rgba(37, 117, 252, 0.7); }
+        }
+        
+.subtitle {
+    font-size: 1.8rem;
+    opacity: 0.8;
+    margin-bottom: 3rem;
+    white-space: nowrap; /* evita saltos de línea */
+    max-width: 100%;
+    overflow-x: auto; /* permite scroll horizontal si es demasiado largo */
+    text-align: center;
+    opacity: 0;
+    transform: translateY(30px);
+}
+
+        
+        .subtitle.animate-in {
+            animation: fadeInUpDelay 1s ease forwards;
+            animation-delay: 0.3s;
+        }
+        
+        @keyframes fadeInUpDelay {
+            to {
+                opacity: 0.8;
+                transform: translateY(0);
+            }
+        }
+        
+        /* Estilos para la simulación PhET */
+        .phet-container {
+            width: 100%;
+            max-width: 1000px;
+            margin: 0 auto;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            background: rgba(10, 15, 29, 0.8);
+            padding: 1rem;
+        }
+        
+        .phet-frame {
+            width: 100%;
+            height: 600px;
+            border: none;
+            border-radius: 10px;
+            background: white;
+        }
+        
+        .phet-credit {
+            text-align: center;
+            margin-top: 1.5rem;
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+        
+        .phet-credit a {
+            color: var(--accent);
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+        
+        .phet-credit a:hover {
+            text-decoration: underline;
+            color: var(--secondary);
+        }
+        
+        /* Responsive */
+        @media (max-width: 1100px) {
+            .phet-frame {
+                height: 500px;
+            }
+        }
+        
+        @media (max-width: 900px) {
+            .differences-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .title {
+                font-size: 3rem;
+            }
+            
+            .subtitle {
+                font-size: 1.4rem;
+            }
+            
+            .phet-frame {
+                height: 450px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .section-title { font-size: 2.2rem; }
+            .content-grid { grid-template-columns: 1fr; }
+            .sim-container { flex-direction: column; }
+            .team { gap: 1.2rem; }
+            .member { min-width: 130px; padding: 1rem; }
+            .nav-btn {
+                width: 40px;
+                height: 40px;
+            }
+            
+            .phet-frame {
+                height: 400px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .title {
+                font-size: 2.5rem;
+            }
+            
+            .subtitle {
+                font-size: 1.2rem;
+            }
+            
+            .section-title {
+                font-size: 1.8rem;
+            }
+            
+            .simulation-section {
+                padding: 1.5rem;
+            }
+            
+            .phet-frame {
+                height: 350px;
+            }
+        }
+        
+        /* Animaciones de entrada */
+        .animate-on-scroll {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+        }
+        
+        .animate-on-scroll.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .tools {
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(12px);
+    border-radius: 18px;
+    padding: 1.2rem 1.8rem;
+    text-align: center;
+    box-shadow: 0 12px 25px rgba(0, 0, 0, 0.3);
+    transition: all 0.4s ease;
+    border: 1px solid var(--card-border);
+    position: relative;
+    overflow: hidden;
+    max-width: 600px;
+    margin: 2rem auto;
+}
+
+.tools::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+    transform: rotate(30deg);
+}
+
+.tools:hover {
+    transform: translateY(-12px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+    background: rgba(255, 255, 255, 0.12);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+.tools-title {
+    font-weight: bold;
+    margin-bottom: 0.8rem;
+    color: var(--accent);
+    font-size: 1.3rem;
+    position: relative;
+    z-index: 2;
+}
+
+/* Lista de herramientas */
+.tools-list {
+    list-style: none;
+    padding-left: 0;
+    font-size: 0.95rem;
+    color: #fff;
+    opacity: 0.9;
+    text-align: left;
+    position: relative;
+    z-index: 2;
+    margin: 0 auto;
+    max-width: 500px;
+}
+
+.tools-list li {
+    margin-bottom: 0.6rem;
+    padding-left: 2rem;
+    position: relative;
+}
+
+/* Íconos por herramienta */
+.tools-list li:nth-child(1)::before {
+    content: "🧠"; /* DeepSeek */
+}
+.tools-list li:nth-child(2)::before {
+    content: "🌐"; /* GitHub */
+}
+.tools-list li:nth-child(3)::before {
+    content: "💡"; /* Canva / PowerPoint */
+}
+.tools-list li:nth-child(4)::before {
+    content: "⚙️"; /* GeoGebra / PhET */
+}
+.tools-list li:nth-child(5)::before {
+    content: "✅"; /* ChatGPT */
+}
+
+.tools-list li::before {
+    position: absolute;
+    left: 0;
+    top: 0;
+    font-size: 1.1rem;
+    line-height: 1.2;
+}
+.integrantes {
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(12px);
+    border-radius: 18px;
+    padding: 1.5rem 2rem;
+    text-align: center;
+    box-shadow: 0 12px 25px rgba(0, 0, 0, 0.3);
+    transition: all 0.4s ease;
+    border: 1px solid var(--card-border);
+    position: relative;
+    overflow: hidden;
+    max-width: 800px;
+    margin: 2rem auto;
+}
+
+.integrantes::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+    transform: rotate(30deg);
+}
+
+.integrantes:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+    background: rgba(255, 255, 255, 0.12);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+.integrantes-title {
+    font-weight: bold;
+    margin-bottom: 1rem;
+    color: var(--accent);
+    font-size: 1.3rem;
+    position: relative;
+    z-index: 2;
+}
+
+/* Distribución horizontal responsiva */
+.team {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1rem;
+    position: relative;
+    z-index: 2;
+}
+
+.integrantes {
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(12px);
+    border-radius: 18px;
+    padding: 1.5rem 2rem;
+    text-align: center;
+    box-shadow: 0 12px 25px rgba(0, 0, 0, 0.3);
+    transition: all 0.4s ease;
+    border: 1px solid var(--card-border);
+    position: relative;
+    overflow: hidden;
+    max-width: 100%;
+    width: 100vw; /* súper ancho */
+    margin: 2rem auto;
+}
+
+.integrantes-title {
+    font-weight: bold;
+    margin-bottom: 1rem;
+    color: var(--accent);
+    font-size: 1.5rem;
+    position: relative;
+    z-index: 2;
+}
+
+.team {
+    display: flex;
+    flex-wrap: nowrap; /* para forzar horizontal */
+    overflow-x: auto;  /* scroll si no cabe */
+    gap: 1rem;
+    padding: 1rem 0;
+    scroll-behavior: smooth;
+}
+
+/* Opcional: Estilo del scroll */
+.team::-webkit-scrollbar {
+    height: 6px;
+}
+.team::-webkit-scrollbar-thumb {
+    background: rgba(255,255,255,0.2);
+    border-radius: 10px;
+}
+
+/* Estilo individual de cada miembro */
+.member {
+    flex: 0 0 auto; /* no se encoge */
+    min-width: 200px;
+    max-width: 220px;
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(12px);
+    border-radius: 18px;
+    padding: 1.2rem 1.8rem;
+    text-align: center;
+    box-shadow: 0 12px 25px rgba(0, 0, 0, 0.3);
+    transition: all 0.4s ease;
+    border: 1px solid var(--card-border);
+    position: relative;
+    overflow: hidden;
+}
+
+.member::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+    transform: rotate(30deg);
+}
+
+.member:hover {
+    transform: translateY(-12px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+    background: rgba(255, 255, 255, 0.12);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+.member-name {
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+    color: var(--accent);
+    font-size: 1.3rem;
+    position: relative;
+    z-index: 2;
+}
+
+.member-role {
+    font-size: 0.95rem;
+    opacity: 0.9;
+    position: relative;
+    z-index: 2;
+}
+
+
+  
+
+    </style>
+</head>
+<body>
+    <!-- Efectos de fondo -->
+    <div class="background-effects" id="particles"></div>
+    
+    <!-- Botones de navegación -->
+    <div class="nav-btn prev-btn">
+        <i class="fas fa-chevron-left"></i>
+    </div>
+    
+    <div class="nav-btn next-btn">
+        <i class="fas fa-chevron-right"></i>
+    </div>
+    
+    <!-- Puntos de navegación -->
+    <div class="navigation">
+        <div class="nav-dot active" data-slide="0"></div>
+        <div class="nav-dot" data-slide="1"></div>
+        <div class="nav-dot" data-slide="2"></div>
+        <div class="nav-dot" data-slide="3"></div>
+        <div class="nav-dot" data-slide="4"></div>
+        <div class="nav-dot" data-slide="5"></div>
+    </div>
+    
+    <!-- Contenedor de slides -->
+    <div class="slides-container">
+        <!-- Slide 1: Portada -->
+<div class="slide slide-1">
+    <div class="container">
+        <h1 class="title" id="main-title">Reflexión y Refracción de la Luz</h1>
+        <p class="subtitle" id="main-subtitle">Un análisis detallado de los fenómenos ópticos fundamentales - Física III</p>
+
+        <!-- Integrantes -->
+        <div class="integrantes">
+    <h2 class="integrantes-title">Integrantes</h2>
+    <div class="team">
+        <div class="member">
+            <div class="member-name">Jose Alejandro Baleta</div>
+            <div class="member-role">Reflexión de la Luz</div>
+        </div>
+        <div class="member">
+            <div class="member-name">Sebastian Pretel Romero</div>
+            <div class="member-role">Refracción de la Luz</div>
+        </div>
+        <div class="member">
+            <div class="member-name">Jesus Manuel Arteaga</div>
+            <div class="member-role">Diferencias Claves</div>
+        </div>
+        <div class="member">
+            <div class="member-name">Juan Camilo Diaz Blandon</div>
+            <div class="member-role">Simulación Interactiva</div>
+        </div>
+    </div>
+</div>
+
+
+        <!-- Herramientas Digitales -->
+        <div class="tools">
+            <h2 class="tools-title">Herramientas Digitales Utilizadas</h2>
+            <ul class="tools-list">
+                <li><strong>DeepSeek</strong>: Generación de contenidos y diseño visual</li>
+                <li><strong>GitHub</strong>:Almacenamiento del proyecto</li>
+                <li><strong> PhET</strong>: Simulación interactiva de fenómenos ópticos</li>
+                <li><strong>ChatGPT</strong>: Apoyo en redacción y organización de ideas</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+        
+        <!-- Slide 2: Reflexión -->
+        <div class="slide slide-2">
+            <div class="container">
+                <h2 class="section-title">Reflexión de la Luz</h2>
+                <div class="content-grid">
+                    <div class="card">
+                        <h2 class="card-title"><i class="fas fa-mirror"></i> Concepto Básico</h2>
+                        <div class="card-content">
+                            <p>La reflexión ocurre cuando un rayo de luz incide sobre una superficie y cambia de dirección, regresando al medio del cual proviene.</p>
+                            
+                            <h3>Leyes de la Reflexión</h3>
+                            <ul>
+                                <li><strong>Primera Ley:</strong> El rayo incidente, el reflejado y la normal a la superficie están en el mismo plano.</li>
+                                <li><strong>Segunda Ley:</strong> El ángulo de incidencia (θᵢ) es igual al ángulo de reflexión (θᵣ).</li>
+                            </ul>
+                            
+                            <div class="formula-box">
+                                θᵢ = θᵣ
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <h2 class="card-title"><i class="fas fa-border-style"></i> Tipos de Reflexión</h2>
+                        <div class="card-content">
+                            <h3>Reflexión Especular</h3>
+                            <p>Ocurre en superficies lisas y pulidas como espejos. Los rayos paralelos incidentes se reflejan paralelamente, formando imágenes claras y definidas.</p>
+                            
+                            <h3>Reflexión Difusa</h3>
+                            <p>Sucede en superficies rugosas o irregulares. Los rayos paralelos incidentes se reflejan en direcciones diferentes, difuminando la imagen.</p>
+                            
+                            <h3>Reflexión Total Interna</h3>
+                            <p>Fenómeno que ocurre cuando la luz pasa de un medio con mayor índice de refracción a uno con menor índice, y el ángulo de incidencia supera el ángulo crítico.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <h2 class="card-title"><i class="fas fa-lightbulb"></i> Aplicaciones</h2>
+                        <div class="card-content">
+                            <ul>
+                                <li><strong>Espejos planos y curvos:</strong> Utilizados en óptica, automóviles, telescopios.</li>
+                                <li><strong>Periscopios:</strong> Instrumentos para observar desde posiciones ocultas.</li>
+                                <li><strong>Señalización:</strong> Chalecos y señales reflectantes para seguridad.</li>
+                                <li><strong>Fibra óptica:</strong> Basada en reflexión total interna para transmitir luz.</li>
+                                <li><strong>Láseres:</strong> Cavidades resonantes con espejos para amplificar la luz.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Slide 3: Refracción -->
+        <div class="slide slide-3">
+            <div class="container">
+                <h2 class="section-title">Refracción de la Luz</h2>
+                <div class="content-grid">
+                    <div class="card">
+                        <h2 class="card-title"><i class="fas fa-water"></i> Concepto Básico</h2>
+                        <div class="card-content">
+                            <p>La refracción es el cambio de dirección que experimenta la luz al pasar de un medio a otro con diferente índice de refracción.</p>
+                            
+                            <h3>Ley de Snell</h3>
+                            <p>Describe la relación entre los ángulos de incidencia y refracción:</p>
+                            
+                            <div class="formula-box">
+                                n₁ · sen(θ₁) = n₂ · sen(θ₂)
+                            </div>
+                            
+                            <p>Donde:</p>
+                            <ul>
+                                <li>n₁ y n₂ = Índices de refracción de los medios</li>
+                                <li>θ₁ = Ángulo de incidencia</li>
+                                <li>θ₂ = Ángulo de refracción</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <h2 class="card-title"><i class="fas fa-flask"></i> Índice de Refracción</h2>
+                        <div class="card-content">
+                            <p>El índice de refracción (n) es una medida de cuánto reduce la velocidad de la luz en un medio en comparación con el vacío.</p>
+                            
+                            <div class="formula-box">
+                                n = c / v
+                            </div>
+                            
+                            <p>Donde c es la velocidad de la luz en el vacío (3×10⁸ m/s) y v es la velocidad en el medio.</p>
+                            
+                            <h3>Valores típicos:</h3>
+                            <ul>
+                                <li>Vacío: 1.0</li>
+                                <li>Aire: ~1.0003</li>
+                                <li>Agua: 1.33</li>
+                                <li>Vidrio: 1.5-1.7</li>
+                                <li>Diamante: 2.42</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <h2 class="card-title"><i class="fas fa-rainbow"></i> Fenómenos y Aplicaciones</h2>
+                        <div class="card-content">
+                            <h3>Fenómenos</h3>
+                            <ul>
+                                <li>Desplazamiento aparente de objetos sumergidos</li>
+                                <li>Formación de arcoíris</li>
+                                <li>Espejismos</li>
+                                <li>Dispersión cromática (prismas)</li>
+                            </ul>
+                            
+                            <h3>Aplicaciones</h3>
+                            <ul>
+                                <li>Lentes correctivas (gafas, lentes de contacto)</li>
+                                <li>Microscopios y telescopios</li>
+                                <li>Fotografía (objetivos)</li>
+                                <li>Comunicaciones por fibra óptica</li>
+                                <li>Espectroscopía</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Slide 4: Diferencias -->
+        <div class="slide slide-4">
+            <div class="container">
+                <h2 class="section-title">Diferencias Clave</h2>
+                <div class="differences-grid">
+                    <div class="difference-card">
+                        <h3 class="difference-title">Reflexión</h3>
+                        <ul class="difference-list">
+                            <li>Ocurre cuando la luz rebota en una superficie</li>
+                            <li>La luz permanece en el mismo medio</li>
+                            <li>El ángulo de incidencia es igual al ángulo de reflexión</li>
+                            <li>No cambia la velocidad ni la longitud de onda de la luz</li>
+                            <li>Puede ser especular (superficies lisas) o difusa (superficies rugosas)</li>
+                            <li>Se rige por las leyes de reflexión: 
+                                <div class="formula-box" style="margin-top: 10px;">
+                                    θᵢ = θᵣ
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                    
+                    <div class="difference-card">
+                        <h3 class="difference-title">Refracción</h3>
+                        <ul class="difference-list">
+                            <li>Ocurre cuando la luz pasa de un medio a otro</li>
+                            <li>La luz cambia de medio</li>
+                            <li>El cambio de dirección depende de los índices de refracción</li>
+                            <li>Cambia la velocidad y la longitud de onda de la luz</li>
+                            <li>Puede producir reflexión total interna en ciertas condiciones</li>
+                            <li>Se rige por la ley de Snell: 
+                                <div class="formula-box" style="margin-top: 10px;">
+                                    n₁ · sen(θ₁) = n₂ · sen(θ₂)
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Slide 5: Simulación PhET -->
+        <div class="slide slide-5">
+            <div class="container">
+                <div class="simulation-section">
+                    <h2 class="sim-title">Simulación Interactiva</h2>
+                    <div class="phet-container">
+                        <iframe class="phet-frame" 
+                                src="https://phet.colorado.edu/sims/html/bending-light/latest/bending-light_es.html"
+                                allowfullscreen>
+                        </iframe>
+                        <div class="phet-credit">
+                            Simulación proporcionada por <a href="https://phet.colorado.edu" target="_blank">PhET Interactive Simulations</a>, Universidad de Colorado Boulder, bajo la licencia <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank">CC-BY 4.0</a>.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Slide 6: Conclusión -->
+        <div class="slide slide-6">
+            <div class="container">
+                <div class="conclusion">
+                    <div class="light-ray ray-1"></div>
+                    <div class="light-ray ray-2"></div>
+                    <div class="light-ray ray-3"></div>
+                    
+                    <h2>Conclusión</h2>
+                    <p>Los fenómenos de <span class="highlight">reflexión</span> y <span class="highlight">refracción</span> son fundamentales para comprender el comportamiento de la luz y tienen aplicaciones esenciales en nuestra vida diaria y tecnología avanzada. Mientras la reflexión explica cómo la luz rebota en las superficies, la refracción describe cómo cambia de dirección al pasar entre medios diferentes.</p>
+                    
+                    <p>Estos principios son la base de tecnologías como telescopios, microscopios, cámaras, gafas correctivas y las <span class="highlight">comunicaciones por fibra óptica</span> que impulsan nuestro mundo moderno. El estudio de estos fenómenos continúa abriendo nuevas posibilidades en campos como la fotónica, la computación cuántica y las telecomunicaciones.</p>
+                    
+                    <div class="team-signature">
+                        Jesús, José, Juan y Sebastián - Física III
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Crear partículas de fondo
+        function createParticles() {
+            const container = document.getElementById('particles');
+            const particleCount = 30;
+            
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.classList.add('particle');
+                
+                // Tamaño y posición aleatorios
+                const size = Math.random() * 120 + 30;
+                const posX = Math.random() * 100;
+                const posY = Math.random() * 100 + 100;
+                const delay = Math.random() * 15;
+                
+                particle.style.width = `${size}px`;
+                particle.style.height = `${size}px`;
+                particle.style.left = `${posX}%`;
+                particle.style.top = `${posY}%`;
+                particle.style.animationDelay = `${delay}s`;
+                
+                container.appendChild(particle);
+            }
+        }
+        
+        // Navegación entre slides
+        const slidesContainer = document.querySelector('.slides-container');
+        const slides = document.querySelectorAll('.slide');
+        const navDots = document.querySelectorAll('.nav-dot');
+        const prevBtn = document.querySelector('.prev-btn');
+        const nextBtn = document.querySelector('.next-btn');
+        
+        let currentSlide = 0;
+        const totalSlides = slides.length;
+        
+        // Actualizar navegación
+        function updateNavigation() {
+            // Actualizar puntos
+            navDots.forEach((dot, index) => {
+                dot.classList.toggle('active', index === currentSlide);
+            });
+            
+            // Mover contenedor de slides
+            slidesContainer.style.transform = `translateX(-${currentSlide * 100}vw)`;
+            
+            // Animación para el contenido de la slide actual
+            setTimeout(() => {
+                animateSlideContent();
+            }, 300);
+        }
+        
+        // Animación para el contenido de la slide actual
+        function animateSlideContent() {
+            // Animación para portada
+            if (currentSlide === 0) {
+                document.getElementById('main-title').classList.add('animate-in');
+                document.getElementById('main-subtitle').classList.add('animate-in');
+            }
+            
+            // Animación para las cards
+            const cards = slides[currentSlide].querySelectorAll('.card');
+            cards.forEach((card, index) => {
+                setTimeout(() => {
+                    card.classList.add('animate-in');
+                }, index * 200);
+            });
+            
+            // Animación para las diferencias
+            const diffCards = slides[currentSlide].querySelectorAll('.difference-card');
+            diffCards.forEach((card, index) => {
+                setTimeout(() => {
+                    card.classList.add('animate-in');
+                }, index * 200);
+            });
+            
+            // Animación para la simulación
+            const simSection = slides[currentSlide].querySelector('.simulation-section');
+            if (simSection) {
+                setTimeout(() => {
+                    simSection.classList.add('animate-in');
+                }, 300);
+            }
+            
+            // Animación para la conclusión
+            const conclusion = slides[currentSlide].querySelector('.conclusion');
+            if (conclusion) {
+                setTimeout(() => {
+                    conclusion.classList.add('animate-in');
+                }, 300);
+            }
+        }
+        
+        // Navegar a slide específica
+        function goToSlide(slideIndex) {
+            if (slideIndex >= 0 && slideIndex < totalSlides) {
+                currentSlide = slideIndex;
+                updateNavigation();
+            }
+        }
+        
+        // Navegación con puntos
+        navDots.forEach(dot => {
+            dot.addEventListener('click', () => {
+                const slideIndex = parseInt(dot.getAttribute('data-slide'));
+                goToSlide(slideIndex);
+            });
+        });
+        
+        // Botones anterior/siguiente
+        prevBtn.addEventListener('click', () => {
+            if (currentSlide > 0) {
+                goToSlide(currentSlide - 1);
+            }
+        });
+        
+        nextBtn.addEventListener('click', () => {
+            if (currentSlide < totalSlides - 1) {
+                goToSlide(currentSlide + 1);
+            }
+        });
+        
+        // Navegación con teclado
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowLeft') {
+                if (currentSlide > 0) {
+                    goToSlide(currentSlide - 1);
+                }
+            } else if (e.key === 'ArrowRight') {
+                if (currentSlide < totalSlides - 1) {
+                    goToSlide(currentSlide + 1);
+                }
+            }
+        });
+        
+        // Inicializar
+        createParticles();
+        updateNavigation();
+        
+        // Observador de intersección para animaciones
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('active');
+                }
+            });
+        }, {
+            threshold: 0.1
+        });
+        
+        // Observar elementos para animaciones
+        document.querySelectorAll('.animate-on-scroll').forEach(el => {
+            observer.observe(el);
+        });
+    </script>
+</body>
+</html>

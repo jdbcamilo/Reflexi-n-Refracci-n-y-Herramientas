@@ -1,3 +1,32 @@
+document.addEventListener("DOMContentLoaded", function () {
+  const isMobileOrTablet = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+  const lastDismissed = localStorage.getItem("mobileModalDismissedAt");
+  const now = new Date().getTime();
+  const oneDay = 24 * 60 * 60 * 1000;
+
+  if (isMobileOrTablet && (!lastDismissed || now - lastDismissed > oneDay)) {
+    const modal = document.createElement("div");
+    modal.id = "mobileWarningModal";
+
+    modal.innerHTML = `
+      <div id="mobileWarningContent">
+        <div class="warning-icon">⚠</div>
+        <h2>Advertencia</h2>
+        <p>Está accediendo desde un dispositivo móvil o tablet.<br>
+        Le recomendamos activar el <strong>modo escritorio</strong> en su navegador para una correcta visualización.</p>
+        <button id="mobileWarningClose">Cerrar</button>
+      </div>
+    `;
+
+    document.body.appendChild(modal);
+
+    document.getElementById("mobileWarningClose").onclick = () => {
+      modal.remove();
+      localStorage.setItem("mobileModalDismissedAt", new Date().getTime());
+    };
+  }
+});
+  
   // Crear partículas de fondo
         function createParticles() {
             const container = document.getElementById('particles');
